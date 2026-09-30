@@ -36,6 +36,9 @@ Goal: answer the go/no-go questions with throwaway code.
 - Valuation model: robust statistics first (trimmed median by model/year/condition bucket, recency-weighted), then condition and originality adjustments. Output range plus confidence.
 - **Profit calculator** as a pure, well-tested library: fees by marketplace/category, tax, shipping tables and rate APIs, repairs. Unit tests with golden cases.
 
+### Data source work (see `docs/DATA_SOURCES.md`)
+Reverb provider (#5) and web-search retail provider (#6) are built test-first behind shared provider interfaces during this phase.
+
 ## Phase 3: AI Analysis Pipeline (weeks 4–9)
 1. **Keyframe extraction** from video (sharpness and coverage scoring).
 2. **Identification** via multimodal LLM + retrieval over the catalog; serial OCR and decoding.
