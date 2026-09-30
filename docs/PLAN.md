@@ -1,6 +1,15 @@
-# PawnDude: Implementation Plan (v0.1 draft)
+# PawnDude: Implementation Plan (v0.2 draft)
 
 Guiding idea: **de-risk the two things that could kill the product (valuation data and AI accuracy) before building the polished app.** A pretty camera app on top of an unreliable verdict is worthless.
+
+## SDLC (per `CLAUDE.md`)
+Every unit of work follows the same loop:
+1. **Issue first:** create a GitHub issue with acceptance criteria before starting.
+2. **Feature branch:** one branch per issue (in cloud sessions, the session's designated branch).
+3. **Tests first:** write Playwright E2E tests (and unit tests for pure logic such as the profit calculator) from the acceptance criteria; watch them fail.
+4. **Implement** until green; commits reference the issue (`Refs #N`).
+5. **PR** referencing the issue (`Closes #N`); merge only when **all tests pass** (`npx playwright test`).
+Stack: Next.js (App Router) + TypeScript + Tailwind; Playwright with mobile-viewport projects.
 
 ## Phase 0: Feasibility Spikes (1–2 weeks)
 Goal: answer the go/no-go questions with throwaway code.
@@ -15,7 +24,7 @@ Goal: answer the go/no-go questions with throwaway code.
 **Output:** a go/no-go memo and a finalized data-source decision.
 
 ## Phase 1: Foundations (weeks 2–4)
-- Monorepo: `apps/mobile` (Expo/React Native), `services/api`, `packages/shared` (types, schemas), `ml/` (evals and pipelines).
+- Monorepo: a Next.js App Router app (`app/`, with API route handlers), `lib/` (profit calculator, valuation, shared types/schemas), `e2e/` (Playwright), and `ml/` (evals and pipelines).
 - CI (lint, typecheck, tests); environments; secrets management.
 - Database schema (users, scans, media, analyses, comps, finds/ledger, reference catalog) on Postgres/Supabase; object storage with signed uploads.
 - Auth (email + Apple/Google sign-in).
@@ -37,20 +46,20 @@ Goal: answer the go/no-go questions with throwaway code.
 - Decide on fine-tuning only after the eval shows specific, data-addressable gaps.
 
 ## Phase 4: Mobile App MVP (weeks 5–10)
-- Guided capture wizard with live quality gating (blur/glare/light), video record + photo modes, offline queue.
+- Guided capture wizard with live quality gating (blur/glare/light), video record + photo modes, local-first upload queue.
 - Result screens: Deal Card (verdict and profit), evidence view (photo overlays), comps view, editable assumptions (asking price, repairs, resale price).
 - Finds list and basic ledger.
 - Polished, discreet, fast UX; accessibility pass.
 
 ## Phase 5: Private Beta (weeks 10–14)
-- 20–50 real musicians/flippers scanning in real shops. TestFlight + Play internal track.
+- 20–50 real musicians/flippers scanning in real shops. Distributed as an installable PWA link.
 - Instrument the funnel: capture completion, time to verdict, corrections made, saved → bought → sold.
 - Collect ground truth (actual purchase/sale prices; expert spot-checks of authenticity calls).
 - Weekly accuracy review against the eval set and real outcomes; fix the top failure modes.
 
 ## Phase 6: Launch Prep (weeks 14–18)
 - Legal: disclaimers, ToS/privacy policy, marketplace API terms compliance, data-rights review.
-- Monetization (subscription/credits) and paywall; App Store/Play review prep.
+- Monetization (subscription/credits) and paywall; PWA install polish (and app-store wrapper if required).
 - Observability, cost controls, abuse/rate limiting.
 - Public launch on the first category.
 
@@ -64,7 +73,7 @@ Goal: answer the go/no-go questions with throwaway code.
 
 ## Team and Tooling Assumptions
 - Solo or small team, with Claude Code doing most of the implementation; the human provides domain expertise (gear knowledge for the reference catalog and eval labels), which is the most valuable input to accuracy.
-- Suggested stack: TypeScript everywhere (Expo, Node API, shared types), Python for `ml/` evals and pipelines, Supabase (Postgres/Auth/Storage), a vision-capable Claude model for analysis.
+- Suggested stack: TypeScript everywhere (Next.js, route handlers, shared types), Python for `ml/` evals and pipelines, Supabase (Postgres/Auth/Storage), a vision-capable Claude model for analysis.
 
 ## Immediate Next Steps
 1. Answer the open questions in SPEC §9 (launch category, business model, platforms).
