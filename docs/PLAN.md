@@ -1,4 +1,4 @@
-# PawnDude: Implementation Plan (v0.2 draft)
+# PawnDude: Implementation Plan (v0.3 draft)
 
 Guiding idea: **de-risk the two things that could kill the product (valuation data and AI accuracy) before building the polished app.** A pretty camera app on top of an unreliable verdict is worthless.
 
@@ -6,10 +6,10 @@ Guiding idea: **de-risk the two things that could kill the product (valuation da
 Every unit of work follows the same loop:
 1. **Issue first:** create a GitHub issue with acceptance criteria before starting.
 2. **Feature branch:** one branch per issue (in cloud sessions, the session's designated branch).
-3. **Tests first:** write Playwright E2E tests (and unit tests for pure logic such as the profit calculator) from the acceptance criteria; watch them fail.
+3. **Tests first:** write Maestro (mobile) or Playwright (API) E2E tests, plus unit tests for pure logic such as the profit calculator, from the acceptance criteria; watch them fail.
 4. **Implement** until green; commits reference the issue (`Refs #N`).
-5. **PR** referencing the issue (`Closes #N`); merge only when **all tests pass** (`npx playwright test`).
-Stack: Next.js (App Router) + TypeScript + Tailwind; Playwright with mobile-viewport projects.
+5. **PR** referencing the issue (`Closes #N`); merge only when **all tests pass** (the full test suite).
+Stack: React Native (Expo) + TypeScript app; Next.js API; Maestro and Playwright.
 
 ## Phase 0: Feasibility Spikes (1–2 weeks)
 Goal: answer the go/no-go questions with throwaway code.
@@ -24,7 +24,7 @@ Goal: answer the go/no-go questions with throwaway code.
 **Output:** a go/no-go memo and a finalized data-source decision.
 
 ## Phase 1: Foundations (weeks 2–4)
-- Monorepo: a Next.js App Router app (`app/`, with API route handlers), `lib/` (profit calculator, valuation, shared types/schemas), `e2e/` (Playwright), and `ml/` (evals and pipelines).
+- Monorepo: `apps/mobile` (Expo/React Native), `apps/api` (Next.js route handlers), `packages/shared` (types, schemas, profit calculator, valuation), `e2e/` (Maestro for mobile, Playwright for API), and `ml/` (evals and pipelines).
 - CI (lint, typecheck, tests); environments; secrets management.
 - Database schema (users, scans, media, analyses, comps, finds/ledger, reference catalog) on Postgres/Supabase; object storage with signed uploads.
 - Auth (email + Apple/Google sign-in).
@@ -43,7 +43,7 @@ Goal: answer the go/no-go questions with throwaway code.
 4. **Authenticity analysis**: rule/evidence-based checks plus model judgment; calibrated three-state output.
 5. **Orchestrator:** async jobs, streaming partial results, retries, caching, cost tracking per scan.
 - Prompt and schema versioning; regression-test against the eval set on every change.
-- Decide on fine-tuning only after the eval shows specific, data-addressable gaps.
+- v1 is Claude Vision only; training is phase two. Decide on fine-tuning only after the eval shows specific, data-addressable gaps.
 
 ## Phase 4: Mobile App MVP (weeks 5–10)
 - Guided capture wizard with live quality gating (blur/glare/light), video record + photo modes, local-first upload queue.
@@ -52,14 +52,14 @@ Goal: answer the go/no-go questions with throwaway code.
 - Polished, discreet, fast UX; accessibility pass.
 
 ## Phase 5: Private Beta (weeks 10–14)
-- 20–50 real musicians/flippers scanning in real shops. Distributed as an installable PWA link.
+- 20–50 real musicians/flippers scanning in real shops. TestFlight + Play internal track.
 - Instrument the funnel: capture completion, time to verdict, corrections made, saved → bought → sold.
 - Collect ground truth (actual purchase/sale prices; expert spot-checks of authenticity calls).
 - Weekly accuracy review against the eval set and real outcomes; fix the top failure modes.
 
 ## Phase 6: Launch Prep (weeks 14–18)
 - Legal: disclaimers, ToS/privacy policy, marketplace API terms compliance, data-rights review.
-- Monetization (subscription/credits) and paywall; PWA install polish (and app-store wrapper if required).
+- Monetization (subscription/credits) and paywall; App Store/Play review prep.
 - Observability, cost controls, abuse/rate limiting.
 - Public launch on the first category.
 
@@ -73,7 +73,7 @@ Goal: answer the go/no-go questions with throwaway code.
 
 ## Team and Tooling Assumptions
 - Solo or small team, with Claude Code doing most of the implementation; the human provides domain expertise (gear knowledge for the reference catalog and eval labels), which is the most valuable input to accuracy.
-- Suggested stack: TypeScript everywhere (Next.js, route handlers, shared types), Python for `ml/` evals and pipelines, Supabase (Postgres/Auth/Storage), a vision-capable Claude model for analysis.
+- Suggested stack: TypeScript everywhere (Expo, Next.js API, shared types), Python for `ml/` evals and pipelines, Supabase (Postgres/Auth/Storage), a vision-capable Claude model for analysis.
 
 ## Immediate Next Steps
 1. Answer the open questions in SPEC §9 (launch category, business model, platforms).

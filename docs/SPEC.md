@@ -1,4 +1,4 @@
-# PawnDude: Product Spec (v0.2 draft)
+# PawnDude: Product Spec (v0.3 draft)
 
 ## 1. Vision
 A mobile app that lets any musician turn a Saturday of pawn-shop digging into real side income. Scan an instrument, and PawnDude tells you **what it is, whether it's real, what shape it's in, what it sells for, and what you'd clear after costs**: a clear Buy / Haggle / Pass call with the evidence behind it.
@@ -83,14 +83,14 @@ Outputs:
 - **Fun.** Gear-nerd delight: era trivia, "hidden gem" callouts, a collection/streak feel.
 
 ## 7. AI Approach (high level)
-- **Start with a frontier multimodal model + retrieval, not from-scratch training.** Use a vision-capable LLM for identification, condition findings, and reasoning, grounded by a retrieval layer over curated reference data (model feature timelines, serial decoders, counterfeit tells, component date codes).
+- **v1 uses Claude Vision directly (structured JSON outputs) + retrieval, with no training.** Claude doesn't take video natively, so the app sends sampled keyframes. Use a vision-capable LLM for identification, condition findings, and reasoning, grounded by a retrieval layer over curated reference data (model feature timelines, serial decoders, counterfeit tells, component date codes).
 - **Fine-tune specialized models later**, once labeled data exists: defect detection/segmentation, serial OCR, and model/year classification for the top ~50 instrument families.
 - Labeled data comes from the app itself: user corrections and confirmed outcomes, plus expert-labeled seed data and licensed/public listing imagery (verify terms).
 - **Evaluation first:** build an eval set of ~200+ known-answer instruments (including known fakes and known-condition items) *before* shipping so accuracy is measured, not assumed.
 
 ## 8. Platform and Architecture (proposal)
-- **Client:** mobile-first **Next.js (App Router) + TypeScript + Tailwind PWA**, per `CLAUDE.md`. Installable on iOS/Android; camera through `getUserMedia` and `<input capture>`; keyframes sampled from recorded video in-browser or server-side. Trade-offs: less control over native camera frames, weaker background/offline behavior, and iOS PWA limits. Revisit a native wrapper (Capacitor) or React Native if beta shows capture quality or offline is a blocker.
-- **Backend:** Next.js route handlers/server actions for the API (TypeScript), with a job queue for analysis pipelines with a job queue for analysis pipelines; Postgres (Supabase is already available in this workspace) plus object storage for media.
+- **Client:** **React Native (Expo) + TypeScript**, mobile-only. Guided capture with Expo Camera or VisionCamera; sharp keyframes sampled from video on-device. On-device helpers (not trained by us): blur/glare gating and serial-number OCR (Apple Vision / ML Kit).
+- **Backend:** Next.js route handlers for the API (TypeScript; types shared with the app), with a job queue for analysis pipelines with a job queue for analysis pipelines; Postgres (Supabase is already available in this workspace) plus object storage for media.
 - **AI pipeline:** orchestrated multi-step analysis: keyframe selection → ID → authenticity → condition → valuation, each independently cacheable and retryable.
 - **Privacy/security:** media encrypted in transit and at rest, user-owned data, deletion on request.
 
@@ -110,7 +110,7 @@ Open questions for the product owner:
 2. Business model: freemium (N free scans/month) plus subscription for unlimited scans and the ledger? Or pay per scan?
 3. Geography and marketplaces at launch: US + eBay + Reverb?
 4. Where does the owner want to sell: only eBay, or also Reverb, Facebook Marketplace, and local?
-5. Is a PWA acceptable for the MVP, or is an app-store presence required at launch?
+5. iOS first, or both platforms at launch?
 
 ## 10. Success Metrics
 - ID accuracy (top-1 model/year) on the eval set: target ≥ 90% for launch categories

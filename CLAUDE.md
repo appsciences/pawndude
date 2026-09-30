@@ -6,11 +6,14 @@
 - Reference the issue in commits and PRs
 
 ## Testing
-- E2E tests use Playwright (run with `npx playwright test`)
 - Write tests before implementation (spec-driven development)
+- Mobile E2E tests use Maestro (flows in `e2e/mobile/`)
+- API/web E2E tests use Playwright (run with `npx playwright test`)
+- Pure logic (profit calculator, valuation) gets unit tests with golden cases
 - All tests must pass before merging
 
 ## Stack
-- Next.js (App Router) with TypeScript
-- Tailwind CSS
-- Playwright for E2E testing
+- Mobile app: React Native (Expo) with TypeScript
+- Backend/API: Next.js (App Router) route handlers with TypeScript; Tailwind CSS for any web pages (landing page)
+- Shared TypeScript package for types and schemas used by app and API
+- AI (v1): Claude Vision called directly with structured JSON outputs; no model training until phase two
